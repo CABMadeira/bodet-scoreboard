@@ -5,6 +5,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 
 use crate::basketball_parser::BasketballProtocol;
+use log::{info, warn, error};
 
 /// Web server for basketball overlay
 pub struct WebServer {
@@ -22,8 +23,8 @@ impl WebServer {
 
     pub fn start(&self) -> std::io::Result<()> {
         let listener = TcpListener::bind(&self.address)?;
-        println!("🌐 Web server listening on http://{}", self.address);
-        println!("Open this URL in your browser to see the overlay\n");
+        info!("Web server listening on http://{}", self.address);
+        info!("Open this URL in your browser to see the overlay");
 
         for stream in listener.incoming() {
             match stream {
@@ -31,12 +32,12 @@ impl WebServer {
                     let state = Arc::clone(&self.state);
                     thread::spawn(move || {
                         if let Err(e) = handle_http_request(stream, state) {
-                            eprintln!("Error handling HTTP request: {}", e);
+                            error!("Error handling HTTP request: {}", e);
                         }
                     });
                 }
                 Err(e) => {
-                    eprintln!("Error accepting connection: {}", e);
+                    error!("Error accepting connection: {}", e);
                 }
             }
         }
@@ -112,7 +113,7 @@ fn handle_overlay_request(stream: &mut TcpStream) -> std::io::Result<()> {
         Err(_) => match fs::read_to_string("static/overlay.html") {
             Ok(s) => s,
             Err(e) => {
-                eprintln!("Warning: could not read overlay.html at runtime: {}\nUsing embedded HTML built into the binary.", e);
+                warn!("Could not read overlay.html at runtime: {}. Using embedded HTML built into the binary.", e);
                 include_str!("../overlay.html").to_string()
             }
         },

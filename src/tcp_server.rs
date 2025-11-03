@@ -5,6 +5,7 @@ use std::thread;
 use std::time::Duration;
 
 use crate::basketball_parser::{BasketballProtocol, ParseError};
+use log::{info, warn, error, debug};
 
 /// TCP Server for Basketball Protocol
 pub struct BasketballServer {
@@ -32,8 +33,9 @@ impl BasketballServer {
     /// Start the server and listen for connections
     pub fn start(&self) -> std::io::Result<()> {
         let listener = TcpListener::bind(&self.address)?;
-        println!("🏀 Basketball Protocol Server listening on {}", self.address);
-        println!("Waiting for connections...\n");
+        info!("Basketball Protocol Server listening on {}", self.address);
+        info!("Waiting for connections...");
+            
 
         for stream in listener.incoming() {
             match stream {
@@ -41,12 +43,12 @@ impl BasketballServer {
                     let state = Arc::clone(&self.current_state);
                     thread::spawn(move || {
                         if let Err(e) = handle_client(stream, state) {
-                            eprintln!("Error handling client: {}", e);
+                            error!("Error handling client: {}", e);
                         }
                     });
                 }
                 Err(e) => {
-                    eprintln!("Error accepting connection: {}", e);
+                    error!("Error accepting connection: {}", e);
                 }
             }
         }
@@ -66,7 +68,7 @@ fn handle_client(
     state: Arc<Mutex<Option<BasketballProtocol>>>,
 ) -> std::io::Result<()> {
     let peer_addr = stream.peer_addr()?;
-    println!("📡 New connection from: {}", peer_addr);
+                    info!("New connection from: {}", peer_addr);
 
     // Set read timeout to prevent hanging
     stream.set_read_timeout(Some(Duration::from_secs(300)))?;
@@ -76,15 +78,15 @@ fn handle_client(
 
     loop {
         match stream.read(&mut buffer) {
-            Ok(0) => {
-                // Connection closed
-                println!("❌ Connection closed by: {}", peer_addr);
-                break;
-            }
-            Ok(n) => {
+                Ok(0) => {
+                    // Connection closed
+                    info!("Connection closed by: {}", peer_addr);
+                    break;
+                }
+                Ok(n) => {
                 // Accumulate received data
                 accumulated_data.extend_from_slice(&buffer[..n]);
-                println!("📥 Received {} bytes from {}", n, peer_addr);
+                debug!("Received {} bytes from {}", n, peer_addr);
 
                 // Try to parse complete protocol messages (14 bytes each)
                 while accumulated_data.len() >= 14 {
@@ -93,7 +95,7 @@ fn handle_client(
 
                     match BasketballProtocol::parse(&packet) {
                         Ok(protocol) => {
-                            println!("\n✅ Successfully parsed protocol:");
+                            info!("Successfully parsed protocol:");
                             display_protocol(&protocol);
 
                             // Update shared state
@@ -102,24 +104,24 @@ fn handle_client(
                             // Send acknowledgment back to client
                             let ack = b"ACK\n";
                             if let Err(e) = stream.write_all(ack) {
-                                eprintln!("Failed to send ACK: {}", e);
+                                warn!("Failed to send ACK: {}", e);
                             }
                         }
                         Err(e) => {
-                            eprintln!("❌ Parse error: {}", e);
-                            eprintln!("   Raw bytes: {:02X?}", packet);
+                            error!("Parse error: {}", e);
+                            debug!("Raw bytes: {:02X?}", packet);
 
                             // Send error response
                             let err_msg = format!("ERROR: {}\n", e);
                             if let Err(e) = stream.write_all(err_msg.as_bytes()) {
-                                eprintln!("Failed to send error message: {}", e);
+                                warn!("Failed to send error message: {}", e);
                             }
                         }
                     }
                 }
             }
             Err(e) => {
-                eprintln!("❌ Error reading from {}: {}", peer_addr, e);
+                error!("Error reading from {}: {}", peer_addr, e);
                 break;
             }
         }
@@ -130,22 +132,22 @@ fn handle_client(
 
 /// Display protocol information
 fn display_protocol(protocol: &BasketballProtocol) {
-    println!("  Score: Home {} - {} Away", protocol.home_score, protocol.away_score);
-    println!("  Period: {}", protocol.period_name());
-    println!("  Time: {}", protocol.format_time());
-    println!("  Fouls: Home {} - {} Away", protocol.home_fouls, protocol.away_fouls);
-    println!("  Timeouts: Home {} - {} Away", protocol.home_timeouts, protocol.away_timeouts);
-    println!("  Possession: {:?}", protocol.possession);
-    println!("  Game State: {:?}", protocol.game_state);
+    info!("  Score: Home {} - {} Away", protocol.home_score, protocol.away_score);
+    info!("  Period: {}", protocol.period_name());
+    info!("  Time: {}", protocol.format_time());
+    info!("  Fouls: Home {} - {} Away", protocol.home_fouls, protocol.away_fouls);
+    info!("  Timeouts: Home {} - {} Away", protocol.home_timeouts, protocol.away_timeouts);
+    info!("  Possession: {:?}", protocol.possession);
+    info!("  Game State: {:?}", protocol.game_state);
 
     if protocol.is_overtime() {
-        println!("  ⚠️  Game is in OVERTIME!");
+        warn!("Game is in OVERTIME!");
     }
 
     if protocol.is_finished() {
-        println!("  🏁 Game is FINISHED!");
+        info!("Game is FINISHED!");
     }
-    println!();
+    debug!("");
 }
 
 /// Parse streaming data that may contain multiple protocol messages
