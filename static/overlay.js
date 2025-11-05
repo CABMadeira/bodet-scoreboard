@@ -5,10 +5,32 @@ let currentGameState = null;
 const urlParams = new URLSearchParams(window.location.search);
 const homeTeamName = urlParams.get('home') || 'HOME';
 const awayTeamName = urlParams.get('away') || 'AWAY';
+const homeLogo = urlParams.get('homeLogo') || '';
+const awayLogo = urlParams.get('awayLogo') || '';
 
 // Update team names
 document.getElementById('home-team-name').textContent = homeTeamName;
 document.getElementById('away-team-name').textContent = awayTeamName;
+
+// Update logos
+function setLogo(team, logoUrl) {
+    const img = document.getElementById(`${team}-logo`);
+    const placeholder = document.getElementById(`${team}-placeholder`);
+    if (logoUrl) {
+        img.src = logoUrl;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+        img.onerror = () => {
+            img.style.display = 'none';
+            placeholder.style.display = 'block';
+        };
+    } else {
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+    }
+}
+setLogo('home', homeLogo);
+setLogo('away', awayLogo);
 
 // Connect to SSE endpoint
 const evtSource = new EventSource('/api/stream');

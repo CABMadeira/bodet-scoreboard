@@ -9,34 +9,35 @@
 <body>
     <div class="scoreboard">
         <div class="team home">
-            <div class="team-name" id="home-team-name">HOME</div>
-            <div class="score-stats">
+            <div class="team-header">
+                <img class="logo" id="home-logo" src="" alt="Home Logo">
+                <div class="logo-placeholder" id="home-placeholder"></div>
+                <div class="team-name" id="home-team-name">HOME</div>
                 <div class="score" id="home-score">-</div>
-                <div class="stats">
-                    <div class="stat">
-                        <span class="stat-label">Fouls</span>
-                        <div class="fouls-container" id="home-fouls">
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                        </div>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Fouls</span>
+                    <div class="fouls-container" id="home-fouls">
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
                     </div>
-                    <div class="stat">
-                        <span class="stat-label">Timeouts</span>
-                        <div class="timeouts-container" id="home-timeouts">
-                            <div class="timeout-line"></div>
-                            <div class="timeout-line"></div>
-                            <div class="timeout-line"></div>
-                        </div>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Timeouts</span>
+                    <div class="timeouts-container" id="home-timeouts">
+                        <div class="timeout-line"></div>
+                        <div class="timeout-line"></div>
+                        <div class="timeout-line"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="center-info">
-            <div class="period" id="period">-</div>
             <div class="time-shot-row">
                 <div class="time-container">
                     <div class="time" id="time">--:--</div>
@@ -44,30 +45,33 @@
                 </div>
                 <div class="shot-clock" id="shot-clock">--</div>
             </div>
+            <div class="period" id="period">-</div>
         </div>
 
         <div class="team away">
-            <div class="team-name" id="away-team-name">AWAY</div>
-            <div class="score-stats">
+            <div class="team-header">
                 <div class="score" id="away-score">-</div>
-                <div class="stats">
-                    <div class="stat">
-                        <span class="stat-label">Fouls</span>
-                        <div class="fouls-container" id="away-fouls">
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                            <div class="foul-line"></div>
-                        </div>
+                <div class="team-name" id="away-team-name">AWAY</div>
+                <img class="logo" id="away-logo" src="" alt="Away Logo">
+                <div class="logo-placeholder" id="away-placeholder"></div>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Fouls</span>
+                    <div class="fouls-container" id="away-fouls">
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
+                        <div class="foul-line"></div>
                     </div>
-                    <div class="stat">
-                        <span class="stat-label">Timeouts</span>
-                        <div class="timeouts-container" id="away-timeouts">
-                            <div class="timeout-line"></div>
-                            <div class="timeout-line"></div>
-                            <div class="timeout-line"></div>
-                        </div>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Timeouts</span>
+                    <div class="timeouts-container" id="away-timeouts">
+                        <div class="timeout-line"></div>
+                        <div class="timeout-line"></div>
+                        <div class="timeout-line"></div>
                     </div>
                 </div>
             </div>

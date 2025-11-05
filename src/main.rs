@@ -518,8 +518,8 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let dev_mode = args.iter().any(|a| a == "dev");
 
-    // Initialize logger (reads RUST_LOG if set, defaults to `debug` level)
-    env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
+    // Initialize logger (reads RUST_LOG if set, defaults to `info` level)
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     if dev_mode {
         info!("Starting in dev mode: TCP session bytes will NOT be logged to files");

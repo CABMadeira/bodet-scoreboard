@@ -18,7 +18,7 @@ body {
     display: flex;
     gap: 20px;
     background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 30, 50, 0.95));
-    padding: 20px 30px;
+    padding: 10px 30px;
     border-radius: 20px;
     box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(255, 255, 255, 0.1);
@@ -31,32 +31,55 @@ body {
     align-items: center;
     flex: 1;
     min-width: 150px;
-    gap: 5px;
+    gap: 10px;
 }
 
-.score-stats {
+.logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.team-header {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 20px;
+    width: 100%;
+    gap: 10px;
+}
+
+.logo-placeholder {
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 24px;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    line-height: 50px;
 }
 
 .team-name {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 15px;
     opacity: 0.8;
+    white-space: nowrap;
+    flex: 1;
 }
 
 .score {
-    font-size: 48px;
+    font-size: 36px;
     font-weight: bold;
     color: #fff;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
     font-variant-numeric: tabular-nums;
+    margin-left: auto;
+}
+
+#away-score {
+    margin-left: 0;
 }
 
 .score.updated {
@@ -70,14 +93,15 @@ body {
 
 .stats {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    gap: 20px;
 }
 
 .stat {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 
 .stat-label {
@@ -157,10 +181,14 @@ body {
     letter-spacing: 1px;
     opacity: 0.9;
     margin-bottom: 5px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .time {
-    font-size: 36px;
+    font-size: 30px;
     font-weight: bold;
     color: #fff;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
@@ -206,7 +234,7 @@ body {
     font-variant-numeric: tabular-nums;
     font-family: 'Courier New', monospace;
     background: rgba(0, 0, 0, 0.3);
-    padding: 6px 12px;
+    padding: 2px 6px;
     border-radius: 10px;
     border: 1px solid rgba(255, 165, 0, 0.3);
 }
