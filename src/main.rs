@@ -156,6 +156,15 @@ struct Message31{
 }
 
 #[derive(Debug)]
+struct Message36{
+    id_1: u8,               // First byte of message ID
+    id_2: u8,               // Second byte of message ID
+    seconds_1: u8,         // Seconds * 10
+    seconds_2: u8,         // Seconds * 1
+    seconds_3: u8,         // Seconds * 0.1
+}
+
+#[derive(Debug)]
 struct Message50{
     id_1: u8,               // First byte of message ID
     id_2: u8,               // Second byte of message ID
@@ -216,8 +225,7 @@ impl StatusWord50 {
 pub struct GameState {
     pub home_score: String,
     pub away_score: String,
-    pub time_minutes: String,
-    pub time_seconds: String,
+    pub time: String,
     pub period_name: String,
     pub home_fouls: String,
     pub away_fouls: String,
@@ -233,8 +241,7 @@ impl Default for GameState {
         Self {
             home_score: "-".to_string(),
             away_score: "-".to_string(),
-            time_minutes: "--".to_string(),
-            time_seconds: "--".to_string(),
+            time: "--:--".to_string(),
             period_name: "-".to_string(),
             home_fouls: "-".to_string(),
             away_fouls: "-".to_string(),
@@ -312,22 +319,19 @@ fn parse_valid_frame(frame: ProtocolFrame, game_state: &Arc<Mutex<GameState>>, b
 
             if status_word.possession_in_tenth {
                 let minutes = format!("{}{}", message.minutes_1 as char, message.minutes_2 as char);
-                let seconds = format!("{}{}", message.seconds_1 as char, message.seconds_2 as char);
                 
                 if minutes == "00" {
                     info!(
                         "{}.{}",
                         message.seconds_1 as char, message.seconds_2 as char
                     );
-                    updated_state.time_minutes = format!("{}.{}", message.seconds_1 as char, message.seconds_2 as char);
-                    updated_state.time_seconds = "00".to_string();
+                    updated_state.time = format!("{}.{}", message.seconds_1 as char, message.seconds_2 as char);
                 } else {
                     info!(
                         "{}{}.{}",
                         message.minutes_1 as char, message.minutes_2 as char, message.seconds_2 as char
                     );
-                    updated_state.time_minutes = format!("{}{}", message.minutes_1 as char, message.minutes_2 as char);
-                    updated_state.time_seconds = format!("{}0", message.seconds_2 as char);
+                    updated_state.time = format!("{}{}.{}", message.minutes_1 as char, message.minutes_2 as char, message.seconds_2 as char);
                 }
             } else {
                 info!(
@@ -337,8 +341,7 @@ fn parse_valid_frame(frame: ProtocolFrame, game_state: &Arc<Mutex<GameState>>, b
                     message.seconds_1 as char,
                     message.seconds_2 as char
                 );
-                updated_state.time_minutes = format!("{}{}", message.minutes_1 as char, message.minutes_2 as char);
-                updated_state.time_seconds = format!("{}{}", message.seconds_1 as char, message.seconds_2 as char);
+                updated_state.time = format!("{}{}:{}{}", message.minutes_1 as char, message.minutes_2 as char, message.seconds_1 as char, message.seconds_2 as char);
             }
 
             info!(
@@ -467,6 +470,29 @@ fn parse_valid_frame(frame: ProtocolFrame, game_state: &Arc<Mutex<GameState>>, b
                 );
                 updated_state.shot_clock = Some(format!("{}{}", message.seconds_1 as char, message.seconds_2 as char));
             }
+            state_changed = true;
+        }
+
+        // Message 36
+        (0x33, 0x36) => {
+            // info!("Received Message Type 36 (Possession Time Last Minute)");
+
+            // Ensure there's enough data for Message Type 36
+            if frame.message.len() < 5 {
+                warn!("Message Type 36 too short");
+                return;
+            }
+
+            // Construct the Message 36 struct
+            let message = Message36 {
+                id_1: frame.message[0],
+                id_2: frame.message[1],
+                seconds_1: frame.message[2],
+                seconds_2: frame.message[3],
+                seconds_3: frame.message[4],
+            };
+
+            updated_state.time = format!("{}{}.{}", message.seconds_1 as char, message.seconds_2 as char, message.seconds_3 as char);
             state_changed = true;
         }
 

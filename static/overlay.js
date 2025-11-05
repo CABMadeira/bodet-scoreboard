@@ -36,18 +36,18 @@ function updateScoreboard(data) {
     updateElementIfChanged('away-score', data.away_score);
     
     // Update time with subtle animation
-    updateTime(data.time_minutes, data.time_seconds);
+    updateTime(data.time);
     
     // Update period
     document.getElementById('period').textContent = data.period_name;
     
     // Update fouls
-    updateElement('home-fouls', data.home_fouls);
-    updateElement('away-fouls', data.away_fouls);
+    updateFouls('home', data.home_fouls);
+    updateFouls('away', data.away_fouls);
     
     // Update timeouts
-    updateElement('home-timeouts', data.home_timeouts);
-    updateElement('away-timeouts', data.away_timeouts);
+    updateTimeouts('home', data.home_timeouts);
+    updateTimeouts('away', data.away_timeouts);
     
     // Update shot clock
     updateShotClock(data.shot_clock);
@@ -80,16 +80,39 @@ function updateElement(id, value) {
     }
 }
 
-function updateTime(minutes, seconds) {
-    let timeStr;
+function updateFouls(team, foulsCount) {
+    const container = document.getElementById(`${team}-fouls`);
+    if (!container) return;
     
-    // If minutes contains a dot, it's already in seconds.tenths format
-    if (minutes.includes('.')) {
-        timeStr = minutes;
-    } else {
-        timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
+    const lines = container.querySelectorAll('.foul-line');
+    const count = parseInt(foulsCount) || 0;
     
+    lines.forEach((line, index) => {
+        if (index < count) {
+            line.classList.add('active');
+        } else {
+            line.classList.remove('active');
+        }
+    });
+}
+
+function updateTimeouts(team, timeoutsCount) {
+    const container = document.getElementById(`${team}-timeouts`);
+    if (!container) return;
+    
+    const lines = container.querySelectorAll('.timeout-line');
+    const count = parseInt(timeoutsCount) || 0;
+    
+    lines.forEach((line, index) => {
+        if (index < count) {
+            line.classList.add('active');
+        } else {
+            line.classList.remove('active');
+        }
+    });
+}
+
+function updateTime(timeStr) {
     const timeElement = document.getElementById('time');
     if (!timeElement) return;
     
