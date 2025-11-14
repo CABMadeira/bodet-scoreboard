@@ -353,7 +353,12 @@ fn parse_valid_frame(frame: ProtocolFrame, game_state: &Arc<Mutex<GameState>>, b
 
             updated_state.home_timeouts = (message.home_time_outs as char).to_string();
             updated_state.away_timeouts = (message.guest_time_outs as char).to_string();
-            updated_state.period_name = format!("{} Quarter", message.period as char);
+            let period_char = message.period as char;
+            updated_state.period_name = match period_char {
+                'O' => "Overtime".to_string(),
+                '1' | '2' | '3' | '4' => format!("{} Quarter", period_char),
+                _ => String::new(),
+            };
 
             if status_word.possession_in_tenth {
                 updated_state.possession = Some("Home".to_string());
@@ -682,6 +687,10 @@ async fn start_web_server(game_state: Arc<Mutex<GameState>>, broadcast_tx: tokio
     let js = warp::path("overlay.js")
         .and(warp::fs::file("./static/overlay.js"));
 
+    // GET /media/* -> serve assets from static/media
+    let media = warp::path("media")
+        .and(warp::fs::dir("./static/media"));
+
     // GET /api/game -> return current game state
     let game_state_filter = warp::any().map(move || Arc::clone(&game_state));
     let game_api = warp::path!("api" / "game")
@@ -712,7 +721,12 @@ async fn start_web_server(game_state: Arc<Mutex<GameState>>, broadcast_tx: tokio
             warp::sse::reply(warp::sse::keep_alive().stream(stream))
         });
 
-    let routes = index.or(css).or(js).or(game_api).or(stream_api);
+    let routes = index
+        .or(css)
+        .or(js)
+        .or(media)
+        .or(game_api)
+        .or(stream_api);
 
     info!("Web server starting on http://localhost:3030");
     warp::serve(routes)
