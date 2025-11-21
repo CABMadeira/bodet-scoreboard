@@ -231,9 +231,8 @@ pub struct GameState {
     pub away_fouls: String,
     pub home_timeouts: String,
     pub away_timeouts: String,
-    pub possession: Option<String>, // "Home", "Away", or None
-    pub game_state: String, // "pre-game", "running", "paused", etc.
-    pub shot_clock: Option<String>,
+    pub game_state: String, // "paused" or "running".
+    pub shot_clock: String,
 }
 
 impl Default for GameState {
@@ -247,9 +246,8 @@ impl Default for GameState {
             away_fouls: "-".to_string(),
             home_timeouts: "-".to_string(),
             away_timeouts: "-".to_string(),
-            possession: None,
-            game_state: "pre-game".to_string(),
-            shot_clock: None,
+            game_state: "paused".to_string(),
+            shot_clock: "-".to_string(),
         }
     }
 }
@@ -318,21 +316,11 @@ fn parse_valid_frame(frame: ProtocolFrame, game_state: &Arc<Mutex<GameState>>, b
             }
 
             if status_word.possession_in_tenth {
-                let minutes = format!("{}{}", message.minutes_1 as char, message.minutes_2 as char);
-                
-                if minutes == "00" {
-                    info!(
-                        "{}.{}",
-                        message.seconds_1 as char, message.seconds_2 as char
-                    );
-                    updated_state.time = format!("{}.{}", message.seconds_1 as char, message.seconds_2 as char);
-                } else {
-                    info!(
-                        "{}{}.{}",
-                        message.minutes_1 as char, message.minutes_2 as char, message.seconds_2 as char
-                    );
-                    updated_state.time = format!("{}{}.{}", message.minutes_1 as char, message.minutes_2 as char, message.seconds_2 as char);
-                }
+                info!(
+                    "{}{}.{}",
+                    message.minutes_1 as char, message.minutes_2 as char, message.seconds_2 as char
+                );
+                updated_state.time = format!("{}{}.{}", message.minutes_1 as char, message.minutes_2 as char, message.seconds_2 as char);
             } else {
                 info!(
                     "{}{}:{}{}",
@@ -359,10 +347,6 @@ fn parse_valid_frame(frame: ProtocolFrame, game_state: &Arc<Mutex<GameState>>, b
                 '1' | '2' | '3' | '4' => format!("{} Quarter", period_char),
                 _ => String::new(),
             };
-
-            if status_word.possession_in_tenth {
-                updated_state.possession = Some("Home".to_string());
-            }
 
             state_changed = true;
         }
@@ -467,13 +451,13 @@ fn parse_valid_frame(frame: ProtocolFrame, game_state: &Arc<Mutex<GameState>>, b
                     "Shot Clock Time: {}.{}",
                     message.seconds_1 as char, message.seconds_2 as char
                 );
-                updated_state.shot_clock = Some(format!("{}.{}", message.seconds_1 as char, message.seconds_2 as char));
+                updated_state.shot_clock = format!("{}.{}", message.seconds_1 as char, message.seconds_2 as char);
             } else {
                 info!(
                     "Shot Clock Time: {}{}",
                     message.seconds_1 as char, message.seconds_2 as char
                 );
-                updated_state.shot_clock = Some(format!("{}{}", message.seconds_1 as char, message.seconds_2 as char));
+                updated_state.shot_clock = format!("{}{}", message.seconds_1 as char, message.seconds_2 as char);
             }
             state_changed = true;
         }
