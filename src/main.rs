@@ -1,7 +1,7 @@
 use env_logger::Env;
-use log::{debug, error, info, warn};
+use log::{error, info, warn};
 use std::{
-    fs::OpenOptions, io::{Read, Write}, net::{TcpListener, TcpStream}, os::linux::raw::stat, sync::{Arc, Mutex}, thread, time::{Duration, SystemTime, UNIX_EPOCH}
+    fs::OpenOptions, io::{Read, Write}, net::{TcpListener, TcpStream}, sync::{Arc, Mutex}, thread, time::{Duration, SystemTime, UNIX_EPOCH}
 };
 use warp::Filter;
 use serde::{Deserialize, Serialize};
@@ -109,6 +109,7 @@ fn parse_raw_data(data: &[u8]) -> Result<ProtocolFrame, String> {
     Ok(frame)
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Message18 {
     id_1: u8,            // First byte of message ID
@@ -127,6 +128,7 @@ struct Message18 {
     byte_14: Option<u8>, // Reserved / unused
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Message30 {
     id_1: u8,               // First byte of message ID
@@ -140,6 +142,7 @@ struct Message30 {
     guest_score_3: u8,      // Guest score position 3
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Message31{
     id_1: u8,               // First byte of message ID
@@ -155,6 +158,7 @@ struct Message31{
     team_of_player: u8,    // Team of player
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Message36{
     id_1: u8,               // First byte of message ID
@@ -164,6 +168,7 @@ struct Message36{
     seconds_3: u8,         // Seconds * 0.1
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Message50{
     id_1: u8,               // First byte of message ID
@@ -195,6 +200,7 @@ impl StatusWord18 {
     }
 }
 
+#[allow(dead_code)]
 struct StatusWord50 {
     b0: Option<bool>, // bit 0
     status_possession_timer: bool,       
